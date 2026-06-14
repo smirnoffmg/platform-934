@@ -1,5 +1,7 @@
 ### Ansible ###
 *.retry
+.ansible/
+ansible/inventory/hosts.ini
 
 ### Linux ###
 *~

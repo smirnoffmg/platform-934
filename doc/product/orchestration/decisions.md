@@ -13,3 +13,5 @@
 - 2026-06-14T19:18:44.219Z — spawn Architect for FEAT-0005 "Single-Command Rotation and Decoy Cover Site" → ~ product/03-features/0005-make-rotate-and-decoy-site.md
 
 - 2026-06-14T19:21:45.189Z — spawn TechLead for FEAT-0005 "Single-Command Rotation and Decoy Cover Site" → + product/04-tasks/0009-xray-reality-dest-variable-and-template-update.md, + product/04-tasks/0010-new-port-script.md, + product/04-tasks/0011-sni-candidates-list.md, + product/04-tasks/0012-make-rotate-target.md, + product/04-tasks/0013-decoy-site-role.md, + product/04-tasks/0014-firewall-role-decoy-ports.md, + product/04-tasks/0015-decoy-site-molecule-scenario-and-playbook-wiring.md
+
+- 2026-06-14T19:29:47.936Z — spawn Dev for TASK-0003 "TASK-0003" (FEAT-0001) → ~ product/04-tasks/0003-amneziawg-role.md

@@ -1,6 +1,6 @@
 ---
 id: FEAT-0001
-status: proposed
+status: accepted
 solution_hypothesis_id: SOL-0006
 architectural_review_status: cleared
 ---

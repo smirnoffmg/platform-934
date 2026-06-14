@@ -1,0 +1,24 @@
+---
+# Xray (VLESS + XTLS-Vision + REALITY)
+xray_port: "PLACEHOLDER_XRAY_PORT"          # TCP port Xray listens on; integer 1–65535; templates must pipe through | int
+xray_uuid: "PLACEHOLDER_XRAY_UUID"          # VLESS user UUID; UUIDv4 string
+xray_server_name: "PLACEHOLDER_SNI"         # REALITY serverName; must be a real TLS-serving domain
+
+# Hysteria2
+hysteria2_port: "PLACEHOLDER_HY2_PORT"      # UDP port Hysteria2 listens on; integer 1–65535; templates must pipe through | int
+hysteria2_obfs_password: "PLACEHOLDER_HY2_OBFS"  # Salamander obfuscation password; arbitrary string
+
+# AmneziaWG
+awg_port: "PLACEHOLDER_AWG_PORT"            # UDP port AmneziaWG listens on; integer 1–65535; templates must pipe through | int
+awg_jc: "PLACEHOLDER_AWG_JC"               # Junk packet count; integer 3–10 recommended; templates must pipe through | int
+awg_jmin: "PLACEHOLDER_AWG_JMIN"           # Minimum junk packet size in bytes; templates must pipe through | int
+awg_jmax: "PLACEHOLDER_AWG_JMAX"           # Maximum junk packet size in bytes; must be >= awg_jmin; templates must pipe through | int
+
+# SSH
+ssh_port: 22                                # SSH port; change before locking firewall if non-standard
+
+# Firewall / access control
+# WARNING: empty list disables source-IP restriction on SSH — all IPs can reach ssh_port
+# NOTE: xray_port, hysteria2_port, awg_port, and ssh_port must all be distinct;
+#       the firewall role (TASK-0006) will enforce this at runtime
+client_ip_whitelist: []                     # List of operator CIDR strings allowed SSH access; e.g. ["203.0.113.5/32"]
