@@ -2,7 +2,7 @@
 - name: Provision VPS
   hosts: vps
   gather_facts: true   # must be true so ansible_distribution is populated before the assert fires
-  # become: true        # uncomment before TASK-0002 — all role tasks require privilege escalation
+  become: true
   vars_files:
     - vars/main.yml
 

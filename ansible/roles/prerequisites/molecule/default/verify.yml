@@ -1,0 +1,27 @@
+---
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    # AC-3 / AC-9: assert required packages are present via dpkg-query.
+    # package_facts with manager: apt requires the python-apt library which may
+    # not be available in the Ansible Python environment inside Docker. dpkg-query
+    # is always available on Debian/Ubuntu and does not need Python bindings.
+    #
+    # linux-headers-* NOT asserted — Docker containers share the host kernel
+    # and the headers package is unavailable via APT inside the container.
+    # Real-VPS runs must verify kernel header installation manually. (AC-3 gap)
+    - name: Assert required packages are installed
+      ansible.builtin.command:
+        cmd: dpkg-query -W -f='${Status}' {{ item }}
+      register: pkg_status
+      changed_when: false
+      failed_when: "'install ok installed' not in pkg_status.stdout"
+      loop:
+        - dkms
+        - nftables
+        - curl
+        - unzip
+        - gpg
+        - python3-apt

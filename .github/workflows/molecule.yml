@@ -1,0 +1,43 @@
+---
+name: Molecule
+
+on:
+  push:
+    paths:
+      - "ansible/roles/**"
+      - ".github/workflows/molecule.yml"
+  pull_request:
+    paths:
+      - "ansible/roles/**"
+      - ".github/workflows/molecule.yml"
+
+jobs:
+  molecule:
+    name: "${{ matrix.role }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        role:
+          - prerequisites
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install ansible-core molecule molecule-docker docker
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install community.docker ansible.posix
+
+      - name: Run Molecule
+        run: molecule test
+        working-directory: ansible/roles/${{ matrix.role }}
+        env:
+          ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"

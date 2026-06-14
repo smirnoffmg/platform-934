@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: prerequisites
+  namespace: smirnoffmg
+  author: smirnoffmg
+  description: Installs APT packages required by all downstream roles.
+  license: MIT
+  min_ansible_version: "2.15"
+dependencies: []
