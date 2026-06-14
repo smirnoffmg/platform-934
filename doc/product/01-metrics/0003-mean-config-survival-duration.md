@@ -1,7 +1,9 @@
 ---
 id: MET-0003
 status: proposed
+problem_hypothesis_id: PROB-0001
 ---
+
 # Mean Config Survival Duration
 
 ## What it measures

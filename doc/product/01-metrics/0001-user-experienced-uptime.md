@@ -1,7 +1,9 @@
 ---
 id: MET-0001
 status: proposed
+problem_hypothesis_id: PROB-0001
 ---
+
 # User-Experienced Uptime
 
 ## What it measures

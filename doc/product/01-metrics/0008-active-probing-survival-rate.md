@@ -1,7 +1,9 @@
 ---
 id: MET-0008
 status: proposed
+problem_hypothesis_id: PROB-0001
 ---
+
 # Active-Probing Survival Rate
 
 ## What it measures

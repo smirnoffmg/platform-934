@@ -1,11 +1,11 @@
 ---
 id: SOL-0004
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0004
-secondary_metric_ids:
+metric_ids:
+  - MET-0004
   - MET-0001
 ---
+
 # Client-Side Polling Daemon for Burn Detection
 
 ## Context

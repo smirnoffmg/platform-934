@@ -1,11 +1,11 @@
 ---
 id: SOL-0003
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0003
-secondary_metric_ids:
+metric_ids:
+  - MET-0003
   - MET-0008
 ---
+
 # VPS IP Tier and serverName Selection for Config Longevity
 
 ## Context

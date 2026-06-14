@@ -1,0 +1,5 @@
+title = "gitleaks config"
+
+[allowlist]
+  description = "PLACEHOLDER_ values in documentation are not real secrets"
+  regexes = ['''PLACEHOLDER_[A-Z0-9_]+''']

@@ -1,12 +1,12 @@
 ---
 id: SOL-0007
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0007
-secondary_metric_ids:
+metric_ids:
+  - MET-0007
   - MET-0008
   - MET-0003
 ---
+
 # VLESS + XTLS-Vision + REALITY as Primary Transport
 
 ## Context

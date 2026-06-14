@@ -1,11 +1,11 @@
 ---
 id: SOL-0010
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0010
-secondary_metric_ids:
+metric_ids:
+  - MET-0010
   - MET-0001
 ---
+
 # Multi-Protocol Fallback Stack
 
 ## Context
@@ -15,11 +15,13 @@ No single protocol survives indefinitely in an adaptive censorship environment. 
 The detection-to-rotation interval (MET-0004 + MET-0005) is the window during which the user has no working primary protocol and needs a fallback to maintain connectivity. If the fallback requires manual reconfiguration during this window, the user is effectively offline until they intervene.
 
 For Russia, the fallback stack is ordered by threat model:
+
 1. **REALITY (TCP):** primary; stealth-focused, may be throttled by 16 KB curtain on some ISPs/IPs
 2. **AmneziaWG (UDP):** primary Russia fallback; bypasses TCP curtain, obfuscates WireGuard signature
 3. **Hysteria2 (QUIC/UDP):** tertiary; HTTP/3 masquerade, robust on lossy paths, but QUIC is more visible than AmneziaWG's UDP and China's GFW has inspected QUIC SNI since April 2024
 
 For China, the fallback stack is simpler:
+
 1. **REALITY (TCP):** primary
 2. **Hysteria2 (QUIC):** fallback for lossy paths; AmneziaWG's UDP obfuscation is not targeted at GFW entropy classification
 

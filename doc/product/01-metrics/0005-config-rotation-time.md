@@ -1,7 +1,9 @@
 ---
 id: MET-0005
 status: proposed
+problem_hypothesis_id: PROB-0001
 ---
+
 # Configuration Rotation Time
 
 ## What it measures

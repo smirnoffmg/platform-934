@@ -93,3 +93,6 @@ docs/
 .history
 .ionide
 
+
+### misc
+node_modules

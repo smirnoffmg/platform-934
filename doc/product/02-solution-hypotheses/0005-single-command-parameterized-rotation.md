@@ -1,11 +1,11 @@
 ---
 id: SOL-0005
-status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0005
-secondary_metric_ids:
+status: accepted
+metric_ids:
+  - MET-0005
   - MET-0001
 ---
+
 # Single-Command Parameterized Rotation
 
 ## Context

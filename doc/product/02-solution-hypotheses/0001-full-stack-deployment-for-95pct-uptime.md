@@ -1,12 +1,12 @@
 ---
 id: SOL-0001
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0001
-secondary_metric_ids:
+metric_ids:
+  - MET-0001
   - MET-0002
   - MET-0003
 ---
+
 # Full-Stack Deployment for ≥95% User-Experienced Uptime
 
 ## Context

@@ -1,11 +1,11 @@
 ---
 id: SOL-0002
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0002
-secondary_metric_ids:
+metric_ids:
+  - MET-0002
   - MET-0009
 ---
+
 # UDP Path and Routing Selection for Usable Tunnel Throughput
 
 ## Context

@@ -1,13 +1,13 @@
 ---
 id: SOL-0006
-status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0006
-secondary_metric_ids:
+status: accepted
+metric_ids:
+  - MET-0006
   - MET-0005
   - MET-0003
   - MET-0004
 ---
+
 # Idempotent Ansible Provisioner with SOPS-Encrypted Secrets
 
 ## Context

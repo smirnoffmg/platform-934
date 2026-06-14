@@ -1,7 +1,9 @@
 ---
 id: MET-0004
 status: proposed
+problem_hypothesis_id: PROB-0001
 ---
+
 # Burn Detection Latency
 
 ## What it measures

@@ -25,7 +25,7 @@
 ### Protocol comparison (2026)
 
 - **VLESS + XTLS-Vision + REALITY (Xray-core):** Best overall stealth. REALITY steals a real site's Server Hello, needs no domain/cert of your own, defeats SNI blocking and active probing (probes get forwarded to the real target). XTLS-Vision flattens TLS-in-TLS length/timing signatures and enables Linux `splice` for near-native throughput. Primary recommendation for both China and Russia.
-- **Hysteria2 (QUIC/UDP):** Very fast on lossy/throttled links via "Brutal" congestion control (ignores loss). Salamander obfuscation + masquerade help, but UDP is "louder," and China throttles unclassified UDP (esp. China Telecom 163; QUIC SNI inspected since April 2024). Best as a speed-oriented fallback, not primary stealth. Note: active mid-connection bandwidth throttling cleanly separates Brutal from BBR (Brutal interprets the throttle as loss and pushes *harder*, an exploitable tell).
+- **Hysteria2 (QUIC/UDP):** Very fast on lossy/throttled links via "Brutal" congestion control (ignores loss). Salamander obfuscation + masquerade help, but UDP is "louder," and China throttles unclassified UDP (esp. China Telecom 163; QUIC SNI inspected since April 2024). Best as a speed-oriented fallback, not primary stealth. Note: active mid-connection bandwidth throttling cleanly separates Brutal from BBR (Brutal interprets the throttle as loss and pushes _harder_, an exploitable tell).
 - **TUIC (QUIC/UDP):** Similar profile to Hysteria2; standard QUIC, occasionally throttled. Good fallback.
 - **AmneziaWG (obfuscated WireGuard):** Randomizes WireGuard's fixed headers, adds junk/padding packets (Jc/Jmin/Jmax, H1–H4, S1–S4 params), can mimic QUIC/DNS. Kernel-module speed, same ChaCha20-Poly1305 crypto. Works in Russia where plain WireGuard is dead, but RKN periodically blocks its signatures (requiring updates) and it failed when Cloudflare/foreign IPs were throttled June 2025 (documented in amnezia-vpn/amnezia-client issue #1639). Excellent fallback, especially for full-tunnel/UDP. HRW (July 30, 2025) lists AmneziaWG among the ~7 protocols TSPU blocks.
 - **Shadowsocks-2022 (AEAD, blake3):** Cleaner than legacy SS (proper PSK, replay protection, no active-probing TCP tell), but still "fully encrypted" traffic that GFW can flag; users report China IP bans within ~1 week. Some providers (WannaFlix) found SS still works well in China as of 2025 because some ISPs are more lenient to nondescript TCP/UDP than TLS. Mixed; not a first choice for max stealth. Use AEAD-2022 over TCP **with multiplexing** if used at all.
@@ -77,7 +77,7 @@ REALITY uniquely removes the two things that kill everything else: it has **no d
 ### Reference repos worth studying
 
 - **`XTLS/Xray-examples`** — canonical REALITY/XHTTP server+client JSON; the source of truth for config shape (incl. a "without being stolen" dokodemo-door variant that blocks unauthorized SNIs).
-- **`aleskxyz/reality-ezpz`** — Docker Compose installer supporting Xray *and* sing-box, multiple transports (tcp/http/grpc/ws/tuic/hysteria2/shadowtls), reality/letsencrypt/selfsigned, user management via CLI/TUI/Telegram. Excellent architecture reference for multi-protocol + fallback on one box.
+- **`aleskxyz/reality-ezpz`** — Docker Compose installer supporting Xray _and_ sing-box, multiple transports (tcp/http/grpc/ws/tuic/hysteria2/shadowtls), reality/letsencrypt/selfsigned, user management via CLI/TUI/Telegram. Excellent architecture reference for multi-protocol + fallback on one box.
 - **`233boy/sing-box`** (and `233boy/v2ray`) — battle-tested one-command installers with clean management CLIs (`sb add reality`, etc.); good UX patterns and a tidy state model.
 - **`amnezia-vpn/amneziawg-go`** + community `amneziawg-installer` — AWG params and state-machine installers that survive reboots/DKMS.
 - **`klzgrad/naiveproxy`** — if you choose the Chromium-stack route.
@@ -87,6 +87,7 @@ REALITY uniquely removes the two things that kill everything else: it has **no d
 **Goal:** idempotent, reproducible, secrets-safe, swappable core, extensible toward Terraform — without IaC bloat in step one.
 
 Recommended layout:
+
 ```
 repo/
   README.md
@@ -112,12 +113,12 @@ repo/
 
 **Engineering choices:**
 
-- **Provisioner:** Ansible is the pragmatic pick — agentless over SSH, idempotent, mature templating, easy secrets via Vault, and the natural layer *below* a future Terraform. Pure bash gets messy and non-idempotent (a failure mid-run leaves a half-configured box). Nix is reproducible but overkill for one box and a steep yak-shave. Given Python/Go fluency, a small **Go CLI using `text/template` + an SSH library** is a legitimate, elegant alternative you'll enjoy maintaining and that compiles to a single static binary — but write it as a thin wrapper, not a full config-management reinvention. Recommendation: **Ansible for step one; keep the door open to a Go CLI if you want ownership of the tooling.**
+- **Provisioner:** Ansible is the pragmatic pick — agentless over SSH, idempotent, mature templating, easy secrets via Vault, and the natural layer _below_ a future Terraform. Pure bash gets messy and non-idempotent (a failure mid-run leaves a half-configured box). Nix is reproducible but overkill for one box and a steep yak-shave. Given Python/Go fluency, a small **Go CLI using `text/template` + an SSH library** is a legitimate, elegant alternative you'll enjoy maintaining and that compiles to a single static binary — but write it as a thin wrapper, not a full config-management reinvention. Recommendation: **Ansible for step one; keep the door open to a Go CLI if you want ownership of the tooling.**
 - **Containers vs systemd:** Docker Compose gives clean version pinning, reproducible runtime, and easy multi-protocol composition (this is what reality-ezpz does). systemd units are lighter and avoid Docker's UDP/network quirks (relevant for QUIC/WireGuard). Recommendation: **systemd for AmneziaWG (kernel module) and Xray; Compose optionally for the decoy site + sing-box.** Make it a per-role choice.
 - **Secrets:** Never commit UUIDs/keys/PSKs. Use **SOPS + age** (great Git-native diff/rotation, language-agnostic) or **Ansible Vault**. Provide a `secrets.example`. Generate secrets on first run; store encrypted.
 - **Config as templates:** Single source of truth for variables (port, SNI/dest, UUID, key) → templated into Xray JSON, wg conf, hysteria yaml. One variable change propagates everywhere (the core reason to template rather than hand-edit — e.g. changing the listening port should be one edit, not six).
 - **Idempotency & reproducibility:** Pin Xray/sing-box/AWG versions in vars; checksum-verify downloads; make every task safe to re-run. A `make deploy` should converge a fresh VPS to a working state unattended.
-- **Extensibility toward Terraform:** Keep "provision the box" (Terraform's future job: create VPS, DNS, firewall) cleanly separated from "configure the box" (Ansible/your CLI today). Have Ansible read host data from an inventory that Terraform can later generate (e.g. via the `terraform` inventory plugin or a generated `hosts.yml`). Use ADRs (`docs/decisions/`) to record the cat-and-mouse changes over time — this domain *will* churn.
+- **Extensibility toward Terraform:** Keep "provision the box" (Terraform's future job: create VPS, DNS, firewall) cleanly separated from "configure the box" (Ansible/your CLI today). Have Ansible read host data from an inventory that Terraform can later generate (e.g. via the `terraform` inventory plugin or a generated `hosts.yml`). Use ADRs (`docs/decisions/`) to record the cat-and-mouse changes over time — this domain _will_ churn.
 - **Resilience tooling:** `scripts/blocked-check.sh` (probe from an external vantage / test handshake + >16 KB transfer to detect the Russian freeze), `rotate-ip.sh`, and a health endpoint. A single `make rotate` to cycle port/SNI/IP is the highest-value operational feature.
 
 ## Recommendations

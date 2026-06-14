@@ -1,12 +1,12 @@
 ---
 id: SOL-0009
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0009
-secondary_metric_ids:
+metric_ids:
+  - MET-0009
   - MET-0010
   - MET-0002
 ---
+
 # AmneziaWG UDP Tunnel for Russia 16 KB Curtain Bypass
 
 ## Context

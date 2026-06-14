@@ -1,11 +1,11 @@
 ---
 id: SOL-0008
 status: proposed
-problem_hypothesis_id: PROB-0001
-target_metric_id: MET-0008
-secondary_metric_ids:
+metric_ids:
+  - MET-0008
   - MET-0003
 ---
+
 # REALITY Transparent Forwarding and Client-IP Firewall Whitelist for Active-Probe Resistance
 
 ## Context
