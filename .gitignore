@@ -1,6 +1,3 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,linux,visualstudiocode,vim,ansible
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,linux,visualstudiocode,vim,ansible
-
 ### Ansible ###
 *.retry
 
@@ -80,6 +77,11 @@ tags
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+
+CLAUDE.md
+.claude/
+docs/
+
 # Local History for Visual Studio Code
 .history/
 
@@ -91,4 +93,3 @@ tags
 .history
 .ionide
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,linux,visualstudiocode,vim,ansible
