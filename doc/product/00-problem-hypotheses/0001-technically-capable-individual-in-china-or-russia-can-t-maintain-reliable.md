@@ -1,9 +1,8 @@
 ---
 id: PROB-0001
 status: accepted
-target_metric_ids:
-  - MET-0001
 ---
+
 # A technically capable individual in China or Russia can't maintain reliable private internet access because commercial VPNs are centralized targets that censors systematically detect and block.
 
 ## Context
