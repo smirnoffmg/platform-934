@@ -1,0 +1,9 @@
+---
+# Role-internal constants — operator must not override these.
+# amneziawg_dkms_version matches PACKAGE_VERSION in src/dkms.conf of the kernel module repo.
+amneziawg_dkms_version: "1.0.0"
+# amneziawg_src_version is the numeric part of the git tag (v1.0.20260611 → 1.0.20260611).
+amneziawg_src_version: "1.0.20260611"
+# amneziawg_tools_version is the full release tag used in the download URL.
+amneziawg_tools_version: "v1.0.20260223"
+amneziawg_tools_zip_sha256: "994289b71dfc8b3392d60f4461a65a869f392653aa5027d217f9519f57340bf0"

@@ -1,0 +1,72 @@
+---
+# lsmod assertions are intentionally absent.
+# Docker containers share the host kernel; DKMS build and module load
+# cannot be tested in this environment (AC-1, AC-8).
+# Real-VPS manual checklist: run `lsmod | grep amneziawg` after reboot.
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Stat /etc/amneziawg/awg0.conf
+      ansible.builtin.stat:
+        path: /etc/amneziawg/awg0.conf
+      register: awg_conf_stat
+
+    - name: Assert awg0.conf exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - awg_conf_stat.stat.exists
+          - awg_conf_stat.stat.mode == '0600'
+        fail_msg: "/etc/amneziawg/awg0.conf is missing or has wrong permissions"
+
+    - name: Read awg0.conf
+      ansible.builtin.slurp:
+        src: /etc/amneziawg/awg0.conf
+      register: awg_conf_slurp
+
+    - name: Assert awg0.conf contains expected values
+      ansible.builtin.assert:
+        that:
+          - "'ListenPort = 51820' in (awg_conf_slurp.content | b64decode)"
+          - "'Jc = 5' in (awg_conf_slurp.content | b64decode)"
+          - "'Jmin = 40' in (awg_conf_slurp.content | b64decode)"
+          - "'Jmax = 70' in (awg_conf_slurp.content | b64decode)"
+        fail_msg: "awg0.conf does not contain expected AmneziaWG parameters"
+
+    - name: Stat /usr/bin/awg
+      ansible.builtin.stat:
+        path: /usr/bin/awg
+      register: awg_bin_stat
+
+    - name: Assert awg binary exists and is executable
+      ansible.builtin.assert:
+        that:
+          - awg_bin_stat.stat.exists
+          - awg_bin_stat.stat.executable
+        fail_msg: "/usr/bin/awg is missing or not executable"
+
+    - name: Stat /usr/bin/awg-quick
+      ansible.builtin.stat:
+        path: /usr/bin/awg-quick
+      register: awg_quick_stat
+
+    - name: Assert awg-quick binary exists and is executable
+      ansible.builtin.assert:
+        that:
+          - awg_quick_stat.stat.exists
+          - awg_quick_stat.stat.executable
+        fail_msg: "/usr/bin/awg-quick is missing or not executable"
+
+    # awg-quick@awg0 is only enabled on real VPS (systemd task skipped in Docker)
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Assert awg-quick@awg0.service is enabled
+      ansible.builtin.assert:
+        that:
+          - "'awg-quick@awg0.service' in ansible_facts.services"
+          - "ansible_facts.services['awg-quick@awg0.service']['status'] == 'enabled'"
+        fail_msg: "awg-quick@awg0.service is not enabled (AC-1, AC-8)"
+      when: ansible_virtualization_type != 'docker'

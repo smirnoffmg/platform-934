@@ -1,2 +1,43 @@
 ---
-# stub — implementation added in subsequent tasks
+- name: Include DKMS tasks
+  ansible.builtin.include_tasks: dkms.yml
+
+- name: Include userspace tool tasks
+  ansible.builtin.include_tasks: userspace.yml
+
+- name: Validate AmneziaWG jitter parameters
+  ansible.builtin.assert:
+    that:
+      - awg_jmin | int <= awg_jmax | int
+    fail_msg: "awg_jmin ({{ awg_jmin }}) must be <= awg_jmax ({{ awg_jmax }})"
+
+- name: Create /etc/amneziawg directory
+  ansible.builtin.file:
+    path: /etc/amneziawg
+    state: directory
+    mode: '0700'
+    owner: root
+
+- name: Template awg0.conf
+  ansible.builtin.template:
+    src: awg0.conf.j2
+    dest: /etc/amneziawg/awg0.conf
+    mode: '0600'
+    owner: root
+  notify: Restart awg-quick@awg0
+
+- name: Install awg-quick@.service systemd unit
+  ansible.builtin.copy:
+    src: "awg-quick@.service"
+    dest: /lib/systemd/system/awg-quick@.service
+    mode: '0644'
+    owner: root
+
+- name: Enable and start awg-quick@awg0
+  ansible.builtin.systemd:
+    name: awg-quick@awg0
+    enabled: true
+    state: started
+    daemon_reload: true
+  # awg-quick requires the kernel module — skip in Docker
+  when: ansible_virtualization_type != 'docker'

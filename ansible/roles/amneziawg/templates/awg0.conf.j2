@@ -1,0 +1,12 @@
+[Interface]
+Address = {{ awg_address }}
+ListenPort = {{ awg_port | int }}
+PrivateKey = {{ awg_private_key }}
+Jc = {{ awg_jc | int }}
+Jmin = {{ awg_jmin | int }}
+Jmax = {{ awg_jmax | int }}
+
+[Peer]
+PublicKey = {{ awg_client_public_key }}
+PresharedKey = {{ awg_preshared_key }}
+AllowedIPs = {{ awg_client_allowed_ips }}

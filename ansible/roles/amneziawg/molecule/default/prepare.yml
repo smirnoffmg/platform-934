@@ -1,0 +1,22 @@
+---
+# Simulate what the prerequisites role delivers so this scenario is self-contained.
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Update APT cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - dkms
+          - curl
+          - unzip
+          - gpg
+          - python3-apt
+          - iproute2
+        state: present

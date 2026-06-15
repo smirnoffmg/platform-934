@@ -1,0 +1,33 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2204
+    image: geerlingguy/docker-ubuntu2204-ansible
+    pre_build_image: true
+    privileged: true
+  - name: debian12
+    image: geerlingguy/docker-debian12-ansible
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+    ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"
+  inventory:
+    group_vars:
+      all:
+        awg_port: 51820
+        awg_jc: 5
+        awg_jmin: 40
+        awg_jmax: 70
+        awg_private_key: "PLACEHOLDER_PRIVKEY"
+        awg_preshared_key: "PLACEHOLDER_PSK"
+        awg_client_public_key: "PLACEHOLDER_CPUBKEY"
+        awg_client_allowed_ips: "10.8.0.2/32"
+        awg_address: "10.8.0.1/24"
+verifier:
+  name: ansible

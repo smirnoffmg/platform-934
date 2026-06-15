@@ -1,0 +1,37 @@
+---
+# Single responsibility: awg and awg-quick binary installation only.
+# No DKMS logic, no config templating, no service management.
+
+- name: Download amneziawg-tools zip
+  ansible.builtin.get_url:
+    url: "https://github.com/amnezia-vpn/amneziawg-tools/releases/download/{{ amneziawg_tools_version }}/ubuntu-22.04-amneziawg-tools.zip"
+    dest: "/tmp/amneziawg-tools-{{ amneziawg_tools_version }}.zip"
+    checksum: "sha256:{{ amneziawg_tools_zip_sha256 }}"
+    mode: '0644'
+  register: amneziawg_tools_download
+  retries: 3
+  delay: 5
+  until: amneziawg_tools_download is succeeded
+
+- name: Extract amneziawg-tools zip
+  ansible.builtin.unarchive:
+    src: "/tmp/amneziawg-tools-{{ amneziawg_tools_version }}.zip"
+    dest: /tmp/
+    remote_src: true
+    creates: /tmp/ubuntu-22.04-amneziawg-tools/awg
+
+- name: Install awg binary
+  ansible.builtin.copy:
+    src: /tmp/ubuntu-22.04-amneziawg-tools/awg
+    dest: /usr/bin/awg
+    mode: '0755'
+    owner: root
+    remote_src: true
+
+- name: Install awg-quick script
+  ansible.builtin.copy:
+    src: /tmp/ubuntu-22.04-amneziawg-tools/awg-quick
+    dest: /usr/bin/awg-quick
+    mode: '0755'
+    owner: root
+    remote_src: true

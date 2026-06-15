@@ -13,6 +13,11 @@ awg_port: "PLACEHOLDER_AWG_PORT"            # UDP port AmneziaWG listens on; int
 awg_jc: "PLACEHOLDER_AWG_JC"               # Junk packet count; integer 3–10 recommended; templates must pipe through | int
 awg_jmin: "PLACEHOLDER_AWG_JMIN"           # Minimum junk packet size in bytes; templates must pipe through | int
 awg_jmax: "PLACEHOLDER_AWG_JMAX"           # Maximum junk packet size in bytes; must be >= awg_jmin; templates must pipe through | int
+awg_private_key: "PLACEHOLDER_AWG_PRIVATE_KEY"         # Server private key; generate with: awg genkey
+awg_preshared_key: "PLACEHOLDER_AWG_PSK"               # Pre-shared key; generate with: awg genpsk
+awg_client_public_key: "PLACEHOLDER_AWG_CLIENT_PUBKEY" # Client public key; from: awg pubkey < client_privkey
+awg_client_allowed_ips: "10.8.0.2/32"                  # CIDR(s) routed to the client peer
+awg_address: "10.8.0.1/24"                             # Server interface address (VPN subnet)
 
 # SSH
 ssh_port: 22                                # SSH port; change before locking firewall if non-standard
