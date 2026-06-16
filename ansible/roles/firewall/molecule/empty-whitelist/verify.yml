@@ -1,0 +1,23 @@
+---
+# Lockout guard (see role README): an empty client_ip_whitelist must fall
+# back to allowing SSH from any source rather than blocking it entirely.
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Read /etc/nftables.conf
+      ansible.builtin.slurp:
+        src: /etc/nftables.conf
+      register: nftables_conf_slurp
+
+    - name: Decode /etc/nftables.conf
+      ansible.builtin.set_fact:
+        nftables_conf_content: "{{ nftables_conf_slurp.content | b64decode }}"
+
+    - name: Assert SSH fallback rule is present and no per-IP rule was rendered
+      ansible.builtin.assert:
+        that:
+          - "'tcp dport 22 accept' in nftables_conf_content"
+          - "'ip saddr' not in nftables_conf_content"
+        fail_msg: "empty client_ip_whitelist did not fall back to allow-all SSH (operator lockout risk)"

@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: firewall
+  namespace: smirnoffmg
+  author: smirnoffmg
+  description: Applies an nftables default-deny ruleset with explicit allowances for SSH (whitelisted), Xray, Hysteria2, and AmneziaWG.
+  license: MIT
+  min_ansible_version: "2.15"
+dependencies: []

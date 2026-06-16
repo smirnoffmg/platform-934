@@ -1,0 +1,15 @@
+---
+# Simulate what the prerequisites role delivers so this scenario is self-contained.
+- name: Prepare
+  hosts: all
+  become: true
+  tasks:
+    - name: Update APT cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install nftables package
+      ansible.builtin.apt:
+        name: nftables
+        state: present

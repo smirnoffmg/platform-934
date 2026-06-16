@@ -1,0 +1,12 @@
+---
+# Single responsibility: /etc/nftables.conf placement only.
+# No package installation, no service management — see install.yml.
+
+- name: Deploy nftables ruleset from template
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: '0600'
+  notify: Reload nftables

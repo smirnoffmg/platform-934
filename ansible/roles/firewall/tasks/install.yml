@@ -1,0 +1,18 @@
+---
+# Single responsibility: nftables package presence and service enablement only.
+# No ruleset templating here — that belongs to rules.yml.
+
+- name: Ensure nftables package is present
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+    update_cache: false  # prerequisites role already refreshed the APT cache
+
+- name: Enable and start nftables service
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+    state: started
+  # Docker containers may not have a fully functional systemd — enabled/state
+  # is verified on a real VPS. See molecule/default/README.md.
+  when: ansible_virtualization_type != 'docker'

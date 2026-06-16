@@ -1,2 +1,8 @@
 ---
-# stub — implementation added in subsequent tasks
+# install.yml must run before rules.yml: the "Reload nftables" handler shells
+# out to nft, which only exists once install.yml's package task completes.
+- name: Install nftables package and enable service
+  ansible.builtin.include_tasks: install.yml
+
+- name: Deploy nftables ruleset from template
+  ansible.builtin.include_tasks: rules.yml

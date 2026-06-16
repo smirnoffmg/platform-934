@@ -19,3 +19,5 @@
 - 2026-06-15T04:16:34.035Z — spawn Dev for TASK-0004 "TASK-0004" (FEAT-0001) → ~ product/04-tasks/0004-xray-role.md
 
 - 2026-06-16T09:05:42.926Z — spawn Dev for TASK-0005 "TASK-0005" (FEAT-0001) → ~ product/04-tasks/0005-hysteria2-role.md
+
+- 2026-06-16T10:59:27.595Z — spawn Dev for TASK-0006 "TASK-0006" (FEAT-0001) → ~ product/04-tasks/0006-firewall-role.md
