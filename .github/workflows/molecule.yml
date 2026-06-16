@@ -22,6 +22,7 @@ jobs:
           - prerequisites
           - amneziawg
           - xray
+          - hysteria2
 
     steps:
       - uses: actions/checkout@v4

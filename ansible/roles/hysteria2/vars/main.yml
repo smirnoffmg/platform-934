@@ -1,0 +1,6 @@
+---
+# Role-internal constants — operator must not override these.
+# Update both together for every upstream Hysteria2 release that changes the
+# binary path, release filename pattern, or systemd unit format (see role README).
+hysteria2_version: "2.9.2"
+hysteria2_binary_sha256: "86fef8e2f1b2bf41318ac96724eee6c3b449e4e510022cc89658b63a6713922a"

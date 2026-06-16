@@ -1,0 +1,12 @@
+[Unit]
+Description=Hysteria2 proxy server v{{ hysteria2_version }}
+After=network.target
+
+[Service]
+# Hysteria2's subcommand is "server", not "run" — do not copy Xray's invocation.
+ExecStart=/usr/local/bin/hysteria2 server --config /etc/hysteria2/config.yaml
+Restart=on-failure
+User=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: hysteria2
+  namespace: smirnoffmg
+  author: smirnoffmg
+  description: Installs the Hysteria2 (QUIC/UDP) binary and configures a Salamander-obfuscated server managed by systemd.
+  license: MIT
+  min_ansible_version: "2.15"
+dependencies: []
