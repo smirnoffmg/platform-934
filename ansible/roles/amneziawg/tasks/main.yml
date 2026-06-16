@@ -11,9 +11,9 @@
       - awg_jmin | int <= awg_jmax | int
     fail_msg: "awg_jmin ({{ awg_jmin }}) must be <= awg_jmax ({{ awg_jmax }})"
 
-- name: Create /etc/amneziawg directory
+- name: Create /etc/amnezia/amneziawg directory
   ansible.builtin.file:
-    path: /etc/amneziawg
+    path: /etc/amnezia/amneziawg
     state: directory
     mode: '0700'
     owner: root
@@ -21,7 +21,10 @@
 - name: Template awg0.conf
   ansible.builtin.template:
     src: awg0.conf.j2
-    dest: /etc/amneziawg/awg0.conf
+    # awg-quick hardcodes this path (CONFIG_FILE="/etc/amnezia/amneziawg/$1.conf");
+    # /etc/amneziawg/ (no "amnezia/" segment) silently fails with
+    # "does not exist" at service start.
+    dest: /etc/amnezia/amneziawg/awg0.conf
     mode: '0600'
     owner: root
   notify: Restart awg-quick@awg0

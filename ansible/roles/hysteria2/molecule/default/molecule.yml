@@ -22,6 +22,7 @@ provisioner:
       all:
         hysteria2_port: 10443
         hysteria2_obfs_password: "test-obfs-password"
+        hysteria2_auth_password: "test-auth-password"
         # Base64 placeholders — never used anywhere real. config.yml just
         # writes whatever is decoded; Hysteria2 itself never parses these
         # files in this scenario (the service isn't exercised as a client).

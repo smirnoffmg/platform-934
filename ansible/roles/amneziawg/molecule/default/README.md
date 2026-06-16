@@ -4,7 +4,7 @@
 
 - **AC-3 (idempotency):** `molecule test` runs converge twice; the second run must report `changed=0`. All tasks use `creates:` guards, `stat`-conditional skips, or module-level idempotency (e.g. `ansible.builtin.copy` by checksum).
 - **AC-4 (variable-rotation idempotency):** Changing `awg_jc` on a subsequent converge produces `changed=1` (template task only) and fires the restart handler exactly once. Xray and Hysteria2 are not present in this scenario.
-- **AC-5 (config contents):** `verify.yml` reads `/etc/amneziawg/awg0.conf` and asserts `ListenPort`, `Jc`, `Jmin`, and `Jmax` match the scenario variables.
+- **AC-5 (config contents):** `verify.yml` reads `/etc/amnezia/amneziawg/awg0.conf` and asserts `ListenPort`, `Jc`, `Jmin`, and `Jmax` match the scenario variables.
 - **AC-11 (Molecule scenario passes):** `molecule test` runs end-to-end without manual steps.
 
 ## ACs not exercised in Docker

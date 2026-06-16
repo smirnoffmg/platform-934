@@ -43,7 +43,12 @@
         that:
           - "'10443' in (hysteria2_config_slurp.content | b64decode)"
           - "'test-obfs-password' in (hysteria2_config_slurp.content | b64decode)"
-        fail_msg: "config.yaml does not contain expected port or obfs password (AC-5)"
+          # auth.type is mandatory — Hysteria2 fails to start with "invalid
+          # config: auth.type: empty auth type" if this is absent. Caught
+          # by a real-VPS run, not by this container scenario, because the
+          # service is never actually started here (see header comment).
+          - "'test-auth-password' in (hysteria2_config_slurp.content | b64decode)"
+        fail_msg: "config.yaml does not contain expected port, obfs password, or auth password (AC-5)"
 
     - name: Stat /etc/hysteria2/server.crt
       ansible.builtin.stat:

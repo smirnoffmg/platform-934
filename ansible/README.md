@@ -13,6 +13,7 @@ All tunable parameters are declared in `vars/main.yml`. **Variable renames here 
 | `xray_server_name`        | Xray                 | `"PLACEHOLDER_SNI"`             |
 | `hysteria2_port`          | Hysteria2            | `"PLACEHOLDER_HY2_PORT"`        |
 | `hysteria2_obfs_password` | Hysteria2            | `"PLACEHOLDER_HY2_OBFS"`        |
+| `hysteria2_auth_password` | Hysteria2            | `"PLACEHOLDER_HY2_AUTH"`        |
 | `hysteria2_tls_cert`      | Hysteria2            | `"PLACEHOLDER_HY2_TLS_CERT"`    |
 | `hysteria2_tls_key`       | Hysteria2            | `"PLACEHOLDER_HY2_TLS_KEY"`     |
 | `awg_port`                | AmneziaWG            | `"PLACEHOLDER_AWG_PORT"`        |
@@ -33,7 +34,7 @@ Roles run in dependency order as declared in `playbook.yml`:
 1. **prerequisites** — OS hardening, kernel tuning (BBR), fail2ban; no protocol variables consumed (TASK-0002)
 2. **amneziawg** — DKMS kernel module, WireGuard interface config; consumes `awg_port`, `awg_jc`, `awg_jmin`, `awg_jmax` (TASK-0003)
 3. **xray** — Xray-core install, VLESS+REALITY config template, systemd unit; consumes `xray_port`, `xray_uuid`, `xray_server_name` (TASK-0004)
-4. **hysteria2** — Hysteria2 install, config template, systemd unit; consumes `hysteria2_port`, `hysteria2_obfs_password`, `hysteria2_tls_cert`, `hysteria2_tls_key` (TASK-0005)
+4. **hysteria2** — Hysteria2 install, config template, systemd unit; consumes `hysteria2_port`, `hysteria2_obfs_password`, `hysteria2_auth_password`, `hysteria2_tls_cert`, `hysteria2_tls_key` (TASK-0005)
 5. **firewall** — nftables ruleset; consumes all port variables and `client_ip_whitelist`; enforces that all ports are distinct and `awg_jmax >= awg_jmin` (TASK-0006)
 
 ## OS support

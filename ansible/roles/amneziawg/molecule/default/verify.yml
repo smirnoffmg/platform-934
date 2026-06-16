@@ -8,9 +8,9 @@
   become: true
   gather_facts: true
   tasks:
-    - name: Stat /etc/amneziawg/awg0.conf
+    - name: Stat /etc/amnezia/amneziawg/awg0.conf
       ansible.builtin.stat:
-        path: /etc/amneziawg/awg0.conf
+        path: /etc/amnezia/amneziawg/awg0.conf
       register: awg_conf_stat
 
     - name: Assert awg0.conf exists with mode 0600
@@ -18,11 +18,11 @@
         that:
           - awg_conf_stat.stat.exists
           - awg_conf_stat.stat.mode == '0600'
-        fail_msg: "/etc/amneziawg/awg0.conf is missing or has wrong permissions"
+        fail_msg: "/etc/amnezia/amneziawg/awg0.conf is missing or has wrong permissions"
 
     - name: Read awg0.conf
       ansible.builtin.slurp:
-        src: /etc/amneziawg/awg0.conf
+        src: /etc/amnezia/amneziawg/awg0.conf
       register: awg_conf_slurp
 
     - name: Assert awg0.conf contains expected values
