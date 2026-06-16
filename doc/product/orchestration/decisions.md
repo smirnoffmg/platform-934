@@ -23,3 +23,5 @@
 - 2026-06-16T10:59:27.595Z — spawn Dev for TASK-0006 "TASK-0006" (FEAT-0001) → ~ product/04-tasks/0006-firewall-role.md
 
 - 2026-06-16T13:41:35.027Z — spawn Dev for TASK-0007 "TASK-0007" (FEAT-0001) → ~ product/04-tasks/0007-makefile-deploy-entry-point.md
+
+- 2026-06-16T14:25:24.404Z — spawn Dev for TASK-0008 "TASK-0008" (FEAT-0001) → ~ product/04-tasks/0008-make-test-molecule-ci-wiring.md

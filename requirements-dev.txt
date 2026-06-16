@@ -1,0 +1,11 @@
+# Pinned to exact versions, not ~= or >=: reproducible CI runs are required
+# (TASK-0008 Notes). Used both locally (`make test`) and by
+# .github/workflows/molecule.yml — single source of truth, no separate
+# CI-only pin file to drift out of sync.
+#
+# molecule-docker (not molecule-plugins[docker]) is the package actually in
+# use across this repo's existing scenarios.
+ansible-core==2.21.0
+molecule==26.4.0
+molecule-docker==2.1.0
+docker==7.1.0

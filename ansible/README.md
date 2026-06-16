@@ -42,3 +42,25 @@ Roles run in dependency order as declared in `playbook.yml`:
 Supported targets: **Ubuntu 22.04 LTS**, **Debian 12**.
 
 A fast-fail assertion in `playbook.yml` `pre_tasks` checks `ansible_distribution` and `ansible_distribution_version`/`ansible_distribution_major_version` before any role runs. Any other OS causes an immediate failure with a human-readable message.
+
+## Running Tests Locally
+
+```sh
+pip install -r requirements-dev.txt   # install pinned molecule + ansible
+make test                             # runs test-deploy then test-molecule
+```
+
+Pinned versions (from `requirements-dev.txt`, repository root): `ansible-core==2.21.0`, `molecule==26.4.0`, `molecule-docker==2.1.0`, `docker==7.1.0`. Always install from this file rather than `pip install molecule` directly — an unpinned local install can pass locally and fail in CI (or vice versa) on a Molecule version with different default behavior.
+
+Requires a running Docker daemon reachable without `sudo`. The `geerlingguy/docker-*-ansible` images each scenario uses need a privileged container (`molecule.yml` already sets `privileged: true` for every scenario — no manual flag needed).
+
+## Real-VPS Test Checklist
+
+`make test` (Molecule, Docker driver) does not cover everything in FEAT-0001's acceptance criteria — a container shares the host kernel and network namespace with the runner, so these require a real VPS:
+
+- **AC-1** (AmneziaWG `lsmod` assertion) — requires a real kernel
+- **AC-2** (cold deploy timing ≤ 15 min) — Docker I/O does not reflect real VPS timing
+- **AC-7** (client-IP whitelist at network level) — requires a real NIC
+- **AC-8** (AmneziaWG survives reboot) — requires a real kernel and an actual reboot
+
+These ACs must be verified manually before any PR touching `ansible/roles/amneziawg/` or `ansible/roles/firewall/` is merged. See [`REAL_VPS_TESTING.md`](REAL_VPS_TESTING.md) for the step-by-step checklist and the `scripts/test-vps-up.sh`/`test-vps-down.sh` tooling it uses.

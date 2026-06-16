@@ -7,8 +7,10 @@ SECRETS_FILE       := ansible/vars/secrets.yml
 # it, SOPS_CMD's output is decrypted and discarded, never reaching ansible.
 ANSIBLE_CMD        ?= ansible-playbook -i ansible/inventory/ ansible/playbook.yml -e @$(SECRETS_FILE)
 CONNECTIVITY_CHECK ?= echo "connectivity check stub"
+ROLES              ?= prerequisites amneziawg xray hysteria2 firewall
+ANSIBLE_ROLES_DIR  ?= ansible/roles
 
-.PHONY: deploy test test-deploy _check-prereqs
+.PHONY: deploy test test-deploy test-molecule _check-prereqs
 
 # Guards AC-9 (fresh-workstation reproducibility): fail loudly before any
 # side effect rather than partway through a stage.
@@ -27,4 +29,28 @@ deploy: _check-prereqs
 test-deploy:
 	sh tests/test_deploy_exit_codes.sh
 
-test: test-deploy
+# Iterates $(ROLES) in order; halts on the first failing role and names it.
+# Molecule itself distinguishes skipped from failed — this loop must not
+# post-process that, just propagate molecule test's exit code verbatim.
+# --all: firewall has a second scenario (empty-whitelist) covering the
+# lockout-guard edge case; plain `molecule test` only runs "default" and
+# would silently skip it. --all is a no-op for every other role here.
+test-molecule:
+	@for role in $(ROLES); do \
+		case "$$role" in \
+			prerequisites) acs="AC-3, AC-9" ;; \
+			amneziawg) acs="AC-1 (partial — kernel module skipped in Docker), AC-3" ;; \
+			xray) acs="AC-3, AC-4, AC-5" ;; \
+			hysteria2) acs="AC-3, AC-4, AC-5" ;; \
+			firewall) acs="AC-3, AC-6" ;; \
+			*) acs="" ;; \
+		esac; \
+		echo "=== [$$role] molecule test — covers: $$acs ==="; \
+		( cd $(ANSIBLE_ROLES_DIR)/$$role && molecule test --all ); \
+		if [ $$? -ne 0 ]; then \
+			echo "ERROR: molecule test failed for role $$role" >&2; \
+			exit 1; \
+		fi; \
+	done
+
+test: test-deploy test-molecule
