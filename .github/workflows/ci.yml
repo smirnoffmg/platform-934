@@ -1,0 +1,52 @@
+---
+name: CI
+
+on:
+  push:
+    paths:
+      - "Makefile"
+      - "tests/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    paths:
+      - "Makefile"
+      - "tests/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  test-deploy:
+    name: "make test-deploy"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python (for ansible)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ansible
+        run: pip install ansible
+
+      # _check-prereqs only checks these binaries exist on PATH — this job
+      # never decrypts a real secret or touches a real VPS (all three deploy
+      # stages are stubbed by the test harness), so no real key material is
+      # needed here.
+      - name: Install sops
+        run: |
+          curl -fsSL -o /usr/local/bin/sops \
+            https://github.com/getsops/sops/releases/download/v3.9.1/sops-v3.9.1.linux.amd64
+          chmod +x /usr/local/bin/sops
+
+      - name: Install age
+        run: |
+          curl -fsSL https://github.com/FiloSottile/age/releases/download/v1.2.0/age-v1.2.0-linux-amd64.tar.gz \
+            | tar -xz -C /tmp
+          install -m 0755 /tmp/age/age /usr/local/bin/age
+          install -m 0755 /tmp/age/age-keygen /usr/local/bin/age-keygen
+
+      - name: make test-deploy
+        run: make test-deploy
+
+      - name: Assert secrets file absent after test run
+        run: test ! -f ansible/vars/secrets.yml

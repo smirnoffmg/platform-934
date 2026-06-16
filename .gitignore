@@ -84,6 +84,7 @@ tags
 
 CLAUDE.md
 .claude/
+.claude.local.md
 docs/
 
 # Local History for Visual Studio Code
