@@ -1,0 +1,44 @@
+---
+# Single responsibility: Xray binary installation only.
+# No config templating, no service management.
+
+- name: Create /usr/local/bin directory
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+    owner: root
+
+- name: Create /etc/xray directory
+  ansible.builtin.file:
+    path: /etc/xray
+    state: directory
+    mode: '0750'
+    owner: root
+    group: root
+
+- name: Download Xray release archive
+  ansible.builtin.get_url:
+    url: "https://github.com/XTLS/Xray-core/releases/download/v{{ xray_version }}/Xray-linux-64.zip"
+    dest: "/tmp/xray-{{ xray_version }}.zip"
+    checksum: "sha256:{{ xray_archive_sha256 }}"
+    mode: '0644'
+    owner: root
+  register: xray_archive_download
+  retries: 3
+  delay: 5
+  until: xray_archive_download is succeeded
+
+- name: Extract xray binary from archive
+  # creates: guards re-extraction. If /tmp's archive is cleaned by an OS tmp-cleanup
+  # timer between runs, get_url above re-downloads it, but this task still reports
+  # changed=0 because /usr/local/bin/xray already exists (AC-3).
+  ansible.builtin.unarchive:
+    src: "/tmp/xray-{{ xray_version }}.zip"
+    dest: /usr/local/bin/
+    include:
+      - xray
+    remote_src: true
+    creates: /usr/local/bin/xray
+    mode: '0755'
+    owner: root

@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: xray
+  namespace: smirnoffmg
+  author: smirnoffmg
+  description: Installs Xray-core and configures a VLESS+XTLS-Vision+REALITY inbound managed by systemd.
+  license: MIT
+  min_ansible_version: "2.15"
+dependencies: []

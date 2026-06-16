@@ -20,6 +20,8 @@ jobs:
       matrix:
         role:
           - prerequisites
+          - amneziawg
+          - xray
 
     steps:
       - uses: actions/checkout@v4

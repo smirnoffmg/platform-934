@@ -1,0 +1,11 @@
+[Unit]
+Description=Xray-core {{ xray_version }} (VLESS+XTLS-Vision+REALITY)
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/xray run -config /etc/xray/config.json
+Restart=on-failure
+User=root
+
+[Install]
+WantedBy=multi-user.target

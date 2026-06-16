@@ -1,0 +1,2 @@
+---
+# No role defaults — operator variables live in ansible/vars/main.yml (single source of truth).
