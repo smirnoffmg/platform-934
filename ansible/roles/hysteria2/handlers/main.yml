@@ -1,0 +1,15 @@
+---
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: true
+  # Docker containers in this scenario do not boot with systemd as PID 1
+  # (confirmed via molecule test: "System has not been booted with systemd").
+  when: ansible_virtualization_type != 'docker'
+
+- name: Restart hysteria2
+  ansible.builtin.systemd:
+    name: hysteria2
+    state: restarted
+  # Docker containers may not have a fully functional systemd — restart is
+  # verified on a real VPS (AC-4).
+  when: ansible_virtualization_type != 'docker'

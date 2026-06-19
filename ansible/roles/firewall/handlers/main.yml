@@ -1,0 +1,6 @@
+---
+- name: Reload nftables
+  # nft -f applies the ruleset atomically without cycling the nftables
+  # service, so Xray/Hysteria2/AmneziaWG are never restarted by this role.
+  ansible.builtin.command: nft -f /etc/nftables.conf
+  changed_when: false

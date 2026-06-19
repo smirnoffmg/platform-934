@@ -1,0 +1,101 @@
+---
+# `state: active` is intentionally not asserted here.
+# Docker containers in this scenario do not boot with systemd as PID 1, so the
+# "Enable and start" task in tasks/main.yml is skipped entirely (when != docker);
+# AC-1 (systemctl is-active hysteria2) is verified manually on a real VPS — see
+# molecule/default/README.md.
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Stat /usr/local/bin/hysteria2
+      ansible.builtin.stat:
+        path: /usr/local/bin/hysteria2
+      register: hysteria2_bin_stat
+
+    - name: Assert hysteria2 binary exists and is executable
+      ansible.builtin.assert:
+        that:
+          - hysteria2_bin_stat.stat.exists
+          - hysteria2_bin_stat.stat.executable
+        fail_msg: "/usr/local/bin/hysteria2 is missing or not executable"
+
+    - name: Stat /etc/hysteria2/config.yaml
+      ansible.builtin.stat:
+        path: /etc/hysteria2/config.yaml
+      register: hysteria2_config_stat
+
+    - name: Assert config.yaml exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - hysteria2_config_stat.stat.exists
+          - hysteria2_config_stat.stat.mode == '0600'
+        fail_msg: "/etc/hysteria2/config.yaml is missing or has wrong permissions"
+
+    - name: Read config.yaml
+      ansible.builtin.slurp:
+        src: /etc/hysteria2/config.yaml
+      register: hysteria2_config_slurp
+
+    - name: Assert config.yaml contains expected values
+      ansible.builtin.assert:
+        that:
+          - "'10443' in (hysteria2_config_slurp.content | b64decode)"
+          - "'test-obfs-password' in (hysteria2_config_slurp.content | b64decode)"
+          # auth.type is mandatory — Hysteria2 fails to start with "invalid
+          # config: auth.type: empty auth type" if this is absent. Caught
+          # by a real-VPS run, not by this container scenario, because the
+          # service is never actually started here (see header comment).
+          - "'test-auth-password' in (hysteria2_config_slurp.content | b64decode)"
+        fail_msg: "config.yaml does not contain expected port, obfs password, or auth password (AC-5)"
+
+    - name: Stat /etc/hysteria2/server.crt
+      ansible.builtin.stat:
+        path: /etc/hysteria2/server.crt
+      register: hysteria2_cert_stat
+
+    - name: Assert server.crt exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - hysteria2_cert_stat.stat.exists
+          - hysteria2_cert_stat.stat.mode == '0600'
+        fail_msg: "/etc/hysteria2/server.crt is missing or has wrong permissions"
+
+    - name: Stat /etc/hysteria2/server.key
+      ansible.builtin.stat:
+        path: /etc/hysteria2/server.key
+      register: hysteria2_key_stat
+
+    - name: Assert server.key exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - hysteria2_key_stat.stat.exists
+          - hysteria2_key_stat.stat.mode == '0600'
+        fail_msg: "/etc/hysteria2/server.key is missing or has wrong permissions"
+
+    - name: Stat /etc/systemd/system/hysteria2.service
+      ansible.builtin.stat:
+        path: /etc/systemd/system/hysteria2.service
+      register: hysteria2_unit_stat
+
+    - name: Assert hysteria2.service unit file exists
+      ansible.builtin.assert:
+        that:
+          - hysteria2_unit_stat.stat.exists
+        fail_msg: "/etc/systemd/system/hysteria2.service is missing"
+
+    # "Enable and start hysteria2.service" in tasks/main.yml is skipped in Docker
+    # (no functional systemd PID 1 in this scenario), so enabled-state is only
+    # checked on a real VPS (AC-1, partial).
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Assert hysteria2.service is enabled
+      ansible.builtin.assert:
+        that:
+          - "'hysteria2.service' in ansible_facts.services"
+          - "ansible_facts.services['hysteria2.service']['status'] == 'enabled'"
+        fail_msg: "hysteria2.service is not enabled (AC-1, partial)"
+      when: ansible_virtualization_type != 'docker'

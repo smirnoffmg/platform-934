@@ -1,0 +1,73 @@
+---
+# `state: active` is intentionally not asserted here.
+# Docker containers in this scenario do not boot with systemd as PID 1, so the
+# "Enable and start" task in tasks/main.yml is skipped entirely (when != docker);
+# AC-1 (systemctl is-active xray) is verified manually on a real VPS — see
+# molecule/default/README.md.
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Stat /usr/local/bin/xray
+      ansible.builtin.stat:
+        path: /usr/local/bin/xray
+      register: xray_bin_stat
+
+    - name: Assert xray binary exists and is executable
+      ansible.builtin.assert:
+        that:
+          - xray_bin_stat.stat.exists
+          - xray_bin_stat.stat.executable
+        fail_msg: "/usr/local/bin/xray is missing or not executable"
+
+    - name: Stat /etc/xray/config.json
+      ansible.builtin.stat:
+        path: /etc/xray/config.json
+      register: xray_config_stat
+
+    - name: Assert config.json exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - xray_config_stat.stat.exists
+          - xray_config_stat.stat.mode == '0600'
+        fail_msg: "/etc/xray/config.json is missing or has wrong permissions"
+
+    - name: Read config.json
+      ansible.builtin.slurp:
+        src: /etc/xray/config.json
+      register: xray_config_slurp
+
+    - name: Assert config.json contains expected values
+      ansible.builtin.assert:
+        that:
+          - "'10443' in (xray_config_slurp.content | b64decode)"
+          - "(xray_clients[0].id) in (xray_config_slurp.content | b64decode)"
+          - "'www.example.com' in (xray_config_slurp.content | b64decode)"
+        fail_msg: "config.json does not contain expected port, UUID, or serverName (AC-5)"
+
+    - name: Stat /etc/systemd/system/xray.service
+      ansible.builtin.stat:
+        path: /etc/systemd/system/xray.service
+      register: xray_unit_stat
+
+    - name: Assert xray.service unit file exists
+      ansible.builtin.assert:
+        that:
+          - xray_unit_stat.stat.exists
+        fail_msg: "/etc/systemd/system/xray.service is missing"
+
+    # "Enable and start xray.service" in tasks/main.yml is skipped in Docker
+    # (no functional systemd PID 1 in this scenario), so enabled-state is only
+    # checked on a real VPS (AC-1, partial).
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Assert xray.service is enabled
+      ansible.builtin.assert:
+        that:
+          - "'xray.service' in ansible_facts.services"
+          - "ansible_facts.services['xray.service']['status'] == 'enabled'"
+        fail_msg: "xray.service is not enabled (AC-1, partial)"
+      when: ansible_virtualization_type != 'docker'

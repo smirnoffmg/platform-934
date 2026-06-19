@@ -1,0 +1,70 @@
+---
+# Single responsibility: DKMS lifecycle only — source download, module build/install.
+# Config templating and service management are in tasks/main.yml.
+
+- name: Download AmneziaWG source tarball
+  ansible.builtin.get_url:
+    url: "https://github.com/amnezia-vpn/amneziawg-linux-kernel-module/archive/refs/tags/v{{ amneziawg_src_version }}.tar.gz"
+    dest: "/tmp/amneziawg-src-{{ amneziawg_src_version }}.tar.gz"
+    mode: '0644'
+  register: amneziawg_src_download
+  retries: 3
+  delay: 5
+  until: amneziawg_src_download is succeeded
+
+- name: Unpack AmneziaWG source to /tmp
+  ansible.builtin.unarchive:
+    src: "/tmp/amneziawg-src-{{ amneziawg_src_version }}.tar.gz"
+    dest: /tmp/
+    remote_src: true
+    creates: "/usr/src/amneziawg-{{ amneziawg_dkms_version }}/dkms.conf"
+
+- name: Place AmneziaWG src/ under /usr/src for DKMS
+  # DKMS requires source at /usr/src/{PACKAGE_NAME}-{PACKAGE_VERSION}/ (from dkms.conf).
+  # The GitHub tarball extracts into a src/ subdirectory, so we move it into position.
+  ansible.builtin.command:
+    cmd: "mv /tmp/amneziawg-linux-kernel-module-{{ amneziawg_src_version }}/src /usr/src/amneziawg-{{ amneziawg_dkms_version }}"
+    creates: "/usr/src/amneziawg-{{ amneziawg_dkms_version }}/dkms.conf"
+
+- name: Register AmneziaWG module with DKMS
+  ansible.builtin.command:
+    cmd: "dkms add -m amneziawg -v {{ amneziawg_dkms_version }}"
+    creates: "/var/lib/dkms/amneziawg/{{ amneziawg_dkms_version }}"
+
+# The three tasks below require linux-headers for the running kernel.
+# Docker containers share the host kernel but headers are unavailable via APT,
+# so they are skipped in Docker (AC-1, AC-8 gap — see molecule/default/README.md).
+
+- name: Assert kernel headers exist before DKMS build
+  ansible.builtin.stat:
+    path: "/usr/src/linux-headers-{{ ansible_kernel }}"
+  register: amneziawg_kernel_headers_stat
+  when: ansible_virtualization_type != 'docker'
+
+- name: Fail if kernel headers are absent
+  ansible.builtin.fail:
+    msg: "Kernel headers for {{ ansible_kernel }} not found at /usr/src/linux-headers-{{ ansible_kernel }}. Ensure the prerequisites role ran successfully."
+  when:
+    - ansible_virtualization_type != 'docker'
+    - not amneziawg_kernel_headers_stat.stat.exists
+
+- name: Build AmneziaWG kernel module via DKMS
+  ansible.builtin.command:
+    cmd: "dkms build -m amneziawg -v {{ amneziawg_dkms_version }} -k {{ ansible_kernel }}"
+    creates: "/var/lib/dkms/amneziawg/{{ amneziawg_dkms_version }}/{{ ansible_kernel }}/{{ ansible_architecture }}/module/amneziawg.ko"
+  when: ansible_virtualization_type != 'docker'
+
+- name: Install AmneziaWG kernel module via DKMS
+  ansible.builtin.command:
+    cmd: "dkms install -m amneziawg -v {{ amneziawg_dkms_version }} -k {{ ansible_kernel }}"
+    creates: "/lib/modules/{{ ansible_kernel }}/updates/dkms/amneziawg.ko"
+  when: ansible_virtualization_type != 'docker'
+
+- name: Enable DKMS autoinstall hook for kernel upgrades
+  # changed_when: false because autoinstall is idempotent in effect — re-running it
+  # on an already-registered module is a no-op. We always run it (not guarded by
+  # creates:) so that the hook survives kernel upgrades (AC-8).
+  ansible.builtin.command:
+    cmd: dkms autoinstall
+  changed_when: false
+  when: ansible_virtualization_type != 'docker'

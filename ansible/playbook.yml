@@ -1,0 +1,29 @@
+---
+- name: Provision VPS
+  hosts: vps
+  gather_facts: true   # must be true so ansible_distribution is populated before the assert fires
+  become: true
+  vars_files:
+    - vars/main.yml
+
+  pre_tasks:
+    - name: Assert supported OS
+      ansible.builtin.assert:
+        that:
+          # NOTE: Ubuntu uses ansible_distribution_version ("22.04", a string),
+          # while Debian uses ansible_distribution_major_version ("12", a string) —
+          # the variable names differ by design; do not unify them.
+          - >
+            (ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04")
+            or
+            (ansible_distribution == "Debian" and ansible_distribution_major_version == "12")
+        fail_msg: >
+          Unsupported OS: {{ ansible_distribution }} {{ ansible_distribution_version }}.
+          Supported: Ubuntu 22.04, Debian 12.
+
+  roles:
+    - prerequisites   # OS hardening, BBR, ufw/nftables, fail2ban (TASK-0002)
+    - amneziawg       # kernel module (DKMS), params, wg config (TASK-0003)
+    - xray            # install, template config, systemd unit (TASK-0004)
+    - hysteria2       # sing-box install + config (TASK-0005)
+    - firewall        # nftables rules, port/source enforcement (TASK-0006)

@@ -1,0 +1,27 @@
+listen: ":{{ hysteria2_port | int }}"
+
+tls:
+  cert: /etc/hysteria2/server.crt
+  key: /etc/hysteria2/server.key
+
+# auth.type is mandatory — Hysteria2 refuses to start with "invalid config:
+# auth.type: empty auth type" if this block is absent. Single-operator setup,
+# so a shared password is the simplest valid auth method.
+auth:
+  type: password
+  password: "{{ hysteria2_auth_password }}"
+
+obfs:
+  type: salamander
+  salamander:
+    password: "{{ hysteria2_obfs_password }}"
+
+quic:
+  initStreamReceiveWindow: 8388608
+  maxStreamReceiveWindow: 8388608
+  initConnReceiveWindow: 20971520
+  maxConnReceiveWindow: 20971520
+
+bandwidth:
+  up: 1 gbps
+  down: 1 gbps

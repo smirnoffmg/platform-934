@@ -11,6 +11,13 @@ repos:
     hooks:
       - id: gitleaks
 
+  - repo: https://github.com/ansible/ansible-lint
+    rev: v25.9.0
+    hooks:
+      - id: ansible-lint
+        files: ^ansible/
+        args: ["ansible/playbook.yml"]
+
   - repo: local
     hooks:
       - id: pet-validate

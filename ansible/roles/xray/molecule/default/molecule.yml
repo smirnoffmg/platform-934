@@ -1,0 +1,35 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2204
+    image: geerlingguy/docker-ubuntu2204-ansible
+    pre_build_image: true
+    privileged: true
+  - name: debian12
+    image: geerlingguy/docker-debian12-ansible
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+    ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"
+  inventory:
+    group_vars:
+      all:
+        xray_port: 10443
+        xray_clients:
+          - id: "12345678-1234-1234-1234-123456789012"
+            email: "test-user"
+        xray_server_name: "www.example.com"
+        xray_reality_dest: "www.example.com:443"
+        # Test-only X25519 keypair (not used anywhere real) — xray run -test validates
+        # privateKey as a well-formed X25519 scalar, so an arbitrary placeholder string fails.
+        xray_private_key: "4O1pgoBpeGRgkD4P_Apjh9C2rzZ5YKPTVdDG-0bp0kk"
+        xray_public_key: "s5HuRsU7ClD9uKyehgjWxPLh3LaoxvlgrawCTAyHHR8"
+        xray_short_id: "aabbccdd"
+verifier:
+  name: ansible

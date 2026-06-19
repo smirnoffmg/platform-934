@@ -1,0 +1,24 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2204
+    image: geerlingguy/docker-ubuntu2204-ansible
+    pre_build_image: true
+    privileged: true
+  - name: debian12
+    image: geerlingguy/docker-debian12-ansible
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  env:
+    # Points to ansible/roles/ so 'prerequisites' role is discoverable
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+    # molecule-docker 2.1.0 uses a string conditional in its destroy.yml that
+    # ansible-core 2.19 rejects; this allows it until molecule-docker is patched.
+    ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"
+verifier:
+  name: ansible

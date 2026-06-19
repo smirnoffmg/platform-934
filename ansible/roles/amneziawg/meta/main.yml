@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  role_name: amneziawg
+  namespace: smirnoffmg
+  author: smirnoffmg
+  description: Installs AmneziaWG kernel module via DKMS and configures the awg0 interface.
+  license: MIT
+  min_ansible_version: "2.15"
+dependencies: []

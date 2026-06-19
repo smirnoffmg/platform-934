@@ -1,0 +1,54 @@
+---
+name: Molecule
+
+on:
+  push:
+    paths:
+      - "ansible/roles/**"
+      - "Makefile"
+      - "requirements-dev.txt"
+      - ".github/workflows/molecule.yml"
+  pull_request:
+    paths:
+      - "ansible/roles/**"
+      - "Makefile"
+      - "requirements-dev.txt"
+      - ".github/workflows/molecule.yml"
+
+jobs:
+  molecule:
+    name: "${{ matrix.role }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        role:
+          - prerequisites
+          - amneziawg
+          - xray
+          - hysteria2
+          - firewall
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Install Ansible collections
+        run: ansible-galaxy collection install community.docker ansible.posix
+
+      - name: make test-molecule
+        # Scoped to one role per matrix job — same command a developer runs
+        # locally (`make test-molecule ROLES=<role>`), not a separate
+        # CI-only invocation that could drift from it.
+        run: make test-molecule ROLES=${{ matrix.role }}
+        env:
+          ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"

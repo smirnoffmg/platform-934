@@ -1,0 +1,31 @@
+#!/usr/sbin/nft -f
+# flush ruleset: every apply replaces the entire ruleset atomically, which is
+# what makes the "Reload nftables" handler idempotent — no stale rules from a
+# previous render can linger.
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Accept established and related connections
+        ct state established,related accept
+
+        # Accept loopback
+        iif "lo" accept
+
+        # Accept SSH from whitelisted IPs only (fail-safe: accept all if list is empty)
+{% if client_ip_whitelist | length > 0 %}
+{% for ip in client_ip_whitelist | unique %}
+        ip saddr {{ ip }} tcp dport {{ ssh_port }} accept
+{% endfor %}
+{% else %}
+        tcp dport {{ ssh_port }} accept
+{% endif %}
+
+        # Accept protocol ports from any source
+        tcp dport {{ xray_port }} accept       # xray VLESS/REALITY is TCP
+        udp dport {{ hysteria2_port }} accept  # hysteria2 is UDP-only
+        udp dport {{ awg_port }} accept        # AmneziaWG (WireGuard-based) is UDP-only
+    }
+}

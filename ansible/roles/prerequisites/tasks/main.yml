@@ -1,0 +1,31 @@
+---
+- name: Update APT cache (bounded, idempotent)
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install prerequisite packages
+  ansible.builtin.apt:
+    name:
+      - dkms
+      - nftables
+      - curl
+      - unzip
+      - gpg
+      - python3-apt
+    state: present
+  register: prerequisites_apt_result
+  retries: 5
+  delay: 10
+  until: prerequisites_apt_result is succeeded
+
+# Docker containers share the host kernel — linux-headers unavailable via APT inside container.
+- name: Install kernel headers
+  ansible.builtin.apt:
+    name: "linux-headers-{{ ansible_kernel }}"
+    state: present
+  register: prerequisites_headers_result
+  retries: 5
+  delay: 10
+  until: prerequisites_headers_result is succeeded
+  when: ansible_virtualization_type != 'docker'

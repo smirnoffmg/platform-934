@@ -1,0 +1,25 @@
+---
+# install.yml must run before config.yml: the config template task's validate:
+# shells out to /usr/local/bin/xray, which only exists once install.yml completes.
+- name: Include binary installation tasks
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include config templating tasks
+  ansible.builtin.include_tasks: config.yml
+
+- name: Install xray.service systemd unit
+  ansible.builtin.template:
+    src: xray.service.j2
+    dest: /etc/systemd/system/xray.service
+    mode: '0644'
+    owner: root
+  notify: Reload systemd
+
+- name: Enable and start xray.service
+  ansible.builtin.systemd:
+    name: xray
+    enabled: true
+    state: started
+  # Docker containers may not have a fully functional systemd — state: started
+  # is verified on a real VPS (AC-1, partial). See molecule/default/README.md.
+  when: ansible_virtualization_type != 'docker'

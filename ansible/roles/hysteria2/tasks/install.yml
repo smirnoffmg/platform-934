@@ -1,0 +1,35 @@
+---
+# Single responsibility: Hysteria2 binary installation only.
+# No config templating, no TLS cert placement, no service management.
+
+- name: Create /usr/local/bin directory
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+    owner: root
+
+- name: Create /etc/hysteria2 directory
+  ansible.builtin.file:
+    path: /etc/hysteria2
+    state: directory
+    mode: '0750'
+    owner: root
+    group: root
+
+- name: Download Hysteria2 binary
+  # Upstream releases a single pre-built binary, not an archive — no unarchive
+  # step is needed. checksum: makes this idempotent: ok if the file already
+  # matches, re-download only if missing or corrupt. Overwriting an in-use
+  # binary is safe on Linux (the running process keeps its old inode until it
+  # exits); the service picks up the new binary on its next restart.
+  ansible.builtin.get_url:
+    url: "https://github.com/apernet/hysteria/releases/download/app/v{{ hysteria2_version }}/hysteria-linux-amd64"
+    dest: /usr/local/bin/hysteria2
+    checksum: "sha256:{{ hysteria2_binary_sha256 }}"
+    mode: '0755'
+    owner: root
+  register: hysteria2_binary_download
+  retries: 3
+  delay: 5
+  until: hysteria2_binary_download is succeeded

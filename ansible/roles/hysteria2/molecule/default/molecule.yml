@@ -1,0 +1,32 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2204
+    image: geerlingguy/docker-ubuntu2204-ansible
+    pre_build_image: true
+    privileged: true
+  - name: debian12
+    image: geerlingguy/docker-debian12-ansible
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+    ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"
+  inventory:
+    group_vars:
+      all:
+        hysteria2_port: 10443
+        hysteria2_obfs_password: "test-obfs-password"
+        hysteria2_auth_password: "test-auth-password"
+        # Base64 placeholders — never used anywhere real. config.yml just
+        # writes whatever is decoded; Hysteria2 itself never parses these
+        # files in this scenario (the service isn't exercised as a client).
+        hysteria2_tls_cert: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0t"
+        hysteria2_tls_key: "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0t"
+verifier:
+  name: ansible

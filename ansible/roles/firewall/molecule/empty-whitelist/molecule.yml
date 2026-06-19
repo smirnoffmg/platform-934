@@ -1,0 +1,25 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: ubuntu2204
+    image: geerlingguy/docker-ubuntu2204-ansible
+    pre_build_image: true
+    privileged: true
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
+    ANSIBLE_ALLOW_BROKEN_CONDITIONALS: "true"
+  inventory:
+    group_vars:
+      all:
+        ssh_port: 22
+        xray_port: 8443
+        hysteria2_port: 10443
+        awg_port: 51820
+        client_ip_whitelist: []
+verifier:
+  name: ansible

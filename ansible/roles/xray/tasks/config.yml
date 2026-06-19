@@ -1,0 +1,14 @@
+---
+# Single responsibility: Xray JSON config templating only.
+# No binary installation, no service management.
+# Requires install.yml to have already run — /usr/local/bin/xray is the
+# validator the template task below shells out to.
+
+- name: Template config.json
+  ansible.builtin.template:
+    src: config.json.j2
+    dest: /etc/xray/config.json
+    mode: '0600'
+    owner: root
+    validate: /usr/local/bin/xray run -test -config %s
+  notify: Restart xray

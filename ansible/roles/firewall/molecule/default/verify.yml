@@ -1,0 +1,69 @@
+---
+# `state: active` is intentionally not asserted here.
+# Docker containers in this scenario do not boot with systemd as PID 1
+# (confirmed empirically: "System has not been booted with systemd as init
+# system"), so "Enable and start nftables service" in tasks/install.yml is
+# skipped entirely (when != docker); AC-7's network-level effect is verified
+# manually on a real VPS — see this directory's README.
+- name: Verify
+  hosts: all
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Stat /etc/nftables.conf
+      ansible.builtin.stat:
+        path: /etc/nftables.conf
+      register: nftables_conf_stat
+
+    - name: Assert /etc/nftables.conf exists with mode 0600
+      ansible.builtin.assert:
+        that:
+          - nftables_conf_stat.stat.exists
+          - nftables_conf_stat.stat.mode == '0600'
+        fail_msg: "/etc/nftables.conf is missing or has wrong permissions"
+
+    - name: Read /etc/nftables.conf
+      ansible.builtin.slurp:
+        src: /etc/nftables.conf
+      register: nftables_conf_slurp
+
+    - name: Decode /etc/nftables.conf
+      ansible.builtin.set_fact:
+        nftables_conf_content: "{{ nftables_conf_slurp.content | b64decode }}"
+
+    - name: Assert protocol port allowances are present (AC-6)
+      ansible.builtin.assert:
+        that:
+          - "'dport 8443 accept' in nftables_conf_content"
+          - "'dport 10443 accept' in nftables_conf_content"
+          - "'dport 51820 accept' in nftables_conf_content"
+        fail_msg: "Expected Xray/Hysteria2/AmneziaWG port allowances are missing"
+
+    - name: Assert client_ip_whitelist entries appear in SSH restrictions (AC-6)
+      ansible.builtin.assert:
+        that:
+          - "'203.0.113.10' in nftables_conf_content"
+          - "'198.51.100.20' in nftables_conf_content"
+        fail_msg: "client_ip_whitelist entries are missing from the rendered ruleset"
+
+    - name: Assert default-deny policy on the input chain
+      ansible.builtin.assert:
+        that:
+          - "'type filter hook input priority 0' in nftables_conf_content"
+          - "'policy drop' in nftables_conf_content"
+        fail_msg: "input chain is not default-deny"
+
+    # "Enable and start nftables service" in tasks/install.yml is skipped in
+    # Docker (no functional systemd PID 1 in this scenario), so enabled-state
+    # is only checked on a real VPS (AC-1, partial).
+    - name: Gather service facts
+      ansible.builtin.service_facts:
+      when: ansible_virtualization_type != 'docker'
+
+    - name: Assert nftables.service is enabled
+      ansible.builtin.assert:
+        that:
+          - "'nftables.service' in ansible_facts.services"
+          - "ansible_facts.services['nftables.service']['status'] == 'enabled'"
+        fail_msg: "nftables.service is not enabled"
+      when: ansible_virtualization_type != 'docker'

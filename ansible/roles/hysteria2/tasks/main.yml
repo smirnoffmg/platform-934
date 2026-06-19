@@ -1,0 +1,26 @@
+---
+# install.yml must run before config.yml: config.yml's tasks notify
+# "Restart hysteria2", and that handler shells out to systemd, which needs
+# the binary in place before it can start the service.
+- name: Include binary installation tasks
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include config templating tasks
+  ansible.builtin.include_tasks: config.yml
+
+- name: Install hysteria2.service systemd unit
+  ansible.builtin.template:
+    src: hysteria2.service.j2
+    dest: /etc/systemd/system/hysteria2.service
+    mode: '0644'
+    owner: root
+  notify: Reload systemd daemon
+
+- name: Enable and start hysteria2.service
+  ansible.builtin.systemd:
+    name: hysteria2
+    enabled: true
+    state: started
+  # Docker containers may not have a fully functional systemd — state: started
+  # is verified on a real VPS (AC-1, partial). See molecule/default/README.md.
+  when: ansible_virtualization_type != 'docker'

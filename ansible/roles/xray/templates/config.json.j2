@@ -1,0 +1,47 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "0.0.0.0",
+      "port": {{ xray_port | int }},
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+{% for client in xray_clients %}
+          {
+            "id": "{{ client.id }}",
+            "flow": "xtls-rprx-vision"{% if client.email is defined %},
+            "email": "{{ client.email }}"{% endif %}
+
+          }{% if not loop.last %},{% endif %}
+
+{% endfor %}
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "{{ xray_reality_dest }}",
+          "xver": 0,
+          "serverNames": [
+            "{{ xray_server_name }}"
+          ],
+          "privateKey": "{{ xray_private_key }}",
+          "shortIds": [
+            "{{ xray_short_id }}"
+          ]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom"
+    }
+  ]
+}

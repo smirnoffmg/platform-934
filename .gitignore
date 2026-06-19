@@ -1,5 +1,10 @@
 ### Ansible ###
 *.retry
+.ansible/
+ansible/inventory/hosts.ini
+ansible/inventory/hosts.prod.ini
+ansible/inventory/hosts.test.ini
+ansible/vars/real.secret.yml
 
 ### Linux ###
 *~
@@ -80,6 +85,7 @@ tags
 
 CLAUDE.md
 .claude/
+.claude.local.md
 docs/
 
 # Local History for Visual Studio Code
@@ -96,3 +102,10 @@ docs/
 
 ### misc
 node_modules
+
+### VPN client artifacts (generated during provisioning, never commit)
+awg-client-*.png
+awg-client-*.conf
+client-config.json
+hysteria2-client.yaml
+vpn-test.log

@@ -1,0 +1,33 @@
+---
+# Single responsibility: Hysteria2 config and TLS cert/key placement only.
+# No binary installation, no service management.
+# Requires install.yml to have already run — /usr/local/bin/hysteria2 must
+# exist before the "Restart hysteria2" handler below can succeed.
+#
+# No validate: on the template task below. Unlike Xray, the Hysteria2 binary
+# does not expose a --test/-test flag suitable for pre-flight validation in
+# Ansible's temp-file model, so this is the correct absence, not an oversight.
+
+- name: Write TLS certificate
+  ansible.builtin.copy:
+    content: "{{ hysteria2_tls_cert | b64decode }}"
+    dest: /etc/hysteria2/server.crt
+    mode: '0600'
+    owner: root
+  notify: Restart hysteria2
+
+- name: Write TLS private key
+  ansible.builtin.copy:
+    content: "{{ hysteria2_tls_key | b64decode }}"
+    dest: /etc/hysteria2/server.key
+    mode: '0600'
+    owner: root
+  notify: Restart hysteria2
+
+- name: Template config.yaml
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/hysteria2/config.yaml
+    mode: '0600'
+    owner: root
+  notify: Restart hysteria2

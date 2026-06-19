@@ -1,0 +1,7 @@
+---
+- name: Restart awg-quick@awg0
+  ansible.builtin.systemd:
+    name: awg-quick@awg0
+    state: restarted
+  # awg-quick requires the kernel module — skip restart in Docker
+  when: ansible_virtualization_type != 'docker'

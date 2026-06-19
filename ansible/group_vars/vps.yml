@@ -1,0 +1,3 @@
+# intentionally empty — all variables are defined in vars/main.yml
+# WARNING: any variable defined here takes precedence over vars_files
+# (Ansible variable precedence: group_vars > vars_files). Keep this empty.

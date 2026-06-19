@@ -13,3 +13,15 @@
 - 2026-06-14T19:18:44.219Z — spawn Architect for FEAT-0005 "Single-Command Rotation and Decoy Cover Site" → ~ product/03-features/0005-make-rotate-and-decoy-site.md
 
 - 2026-06-14T19:21:45.189Z — spawn TechLead for FEAT-0005 "Single-Command Rotation and Decoy Cover Site" → + product/04-tasks/0009-xray-reality-dest-variable-and-template-update.md, + product/04-tasks/0010-new-port-script.md, + product/04-tasks/0011-sni-candidates-list.md, + product/04-tasks/0012-make-rotate-target.md, + product/04-tasks/0013-decoy-site-role.md, + product/04-tasks/0014-firewall-role-decoy-ports.md, + product/04-tasks/0015-decoy-site-molecule-scenario-and-playbook-wiring.md
+
+- 2026-06-14T19:29:47.936Z — spawn Dev for TASK-0003 "TASK-0003" (FEAT-0001) → ~ product/04-tasks/0003-amneziawg-role.md
+
+- 2026-06-15T04:16:34.035Z — spawn Dev for TASK-0004 "TASK-0004" (FEAT-0001) → ~ product/04-tasks/0004-xray-role.md
+
+- 2026-06-16T09:05:42.926Z — spawn Dev for TASK-0005 "TASK-0005" (FEAT-0001) → ~ product/04-tasks/0005-hysteria2-role.md
+
+- 2026-06-16T10:59:27.595Z — spawn Dev for TASK-0006 "TASK-0006" (FEAT-0001) → ~ product/04-tasks/0006-firewall-role.md
+
+- 2026-06-16T13:41:35.027Z — spawn Dev for TASK-0007 "TASK-0007" (FEAT-0001) → ~ product/04-tasks/0007-makefile-deploy-entry-point.md
+
+- 2026-06-16T14:25:24.404Z — spawn Dev for TASK-0008 "TASK-0008" (FEAT-0001) → ~ product/04-tasks/0008-make-test-molecule-ci-wiring.md
