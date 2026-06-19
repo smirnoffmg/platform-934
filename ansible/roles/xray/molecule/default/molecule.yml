@@ -21,7 +21,9 @@ provisioner:
     group_vars:
       all:
         xray_port: 10443
-        xray_uuid: "12345678-1234-1234-1234-123456789012"
+        xray_clients:
+          - id: "12345678-1234-1234-1234-123456789012"
+            email: "test-user"
         xray_server_name: "www.example.com"
         xray_reality_dest: "www.example.com:443"
         # Test-only X25519 keypair (not used anywhere real) — xray run -test validates

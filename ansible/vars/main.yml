@@ -1,7 +1,9 @@
 ---
 # Xray (VLESS + XTLS-Vision + REALITY)
 xray_port: "PLACEHOLDER_XRAY_PORT"          # TCP port Xray listens on; integer 1–65535; templates must pipe through | int
-xray_uuid: "PLACEHOLDER_XRAY_UUID"          # VLESS user UUID; UUIDv4 string
+xray_clients:                               # List of VLESS users; each entry needs id (UUIDv4) and optionally email (for Xray access logs)
+  - id: "PLACEHOLDER_XRAY_UUID"
+    email: "user1"
 xray_server_name: "PLACEHOLDER_SNI"         # REALITY serverName; must be a real TLS-serving domain
 xray_reality_dest: "PLACEHOLDER_XRAY_DEST"  # REALITY dest; "host:443" of the TLS 1.3 site whose handshake is borrowed
 xray_private_key: "PLACEHOLDER_XRAY_PRIVATE_KEY"  # REALITY private key; generate with: xray x25519

@@ -10,7 +10,7 @@ CONNECTIVITY_CHECK ?= echo "connectivity check stub"
 ROLES              ?= prerequisites amneziawg xray hysteria2 firewall
 ANSIBLE_ROLES_DIR  ?= ansible/roles
 
-.PHONY: deploy test test-deploy test-molecule _check-prereqs
+.PHONY: deploy setup client-config test test-deploy test-molecule _check-prereqs
 
 # Guards AC-9 (fresh-workstation reproducibility): fail loudly before any
 # side effect rather than partway through a stage.
@@ -25,6 +25,11 @@ deploy: _check-prereqs
 	$(ANSIBLE_CMD) || { echo "ERROR: ansible-playbook failed — see output above" >&2; exit 1; }; \
 	$(CONNECTIVITY_CHECK) || { echo "ERROR: Connectivity check failed — proxy stack may not be reachable" >&2; exit 1; }; \
 	exit 0
+
+setup:
+	@[ -n "$(IP)" ]       || { echo "Usage: make setup IP=<address> PASSWORD=<root-password>" >&2; exit 1; }
+	@[ -n "$(PASSWORD)" ] || { echo "Usage: make setup IP=<address> PASSWORD=<root-password>" >&2; exit 1; }
+	@scripts/setup-server.sh "$(IP)" "$(PASSWORD)"
 
 test-deploy:
 	sh tests/test_deploy_exit_codes.sh

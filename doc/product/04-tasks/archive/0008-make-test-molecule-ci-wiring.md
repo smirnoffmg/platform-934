@@ -1,7 +1,9 @@
 ---
 id: TASK-0008
-status: todo
+status: done
 feature_id: FEAT-0001
+completed_at: "2026-06-18T16:06:33.964Z"
+commit_sha: 747d9aa68eacab16602b278f9c676b8d2a24249f
 ---
 
 ## Description

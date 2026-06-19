@@ -42,7 +42,7 @@
       ansible.builtin.assert:
         that:
           - "'10443' in (xray_config_slurp.content | b64decode)"
-          - "'12345678-1234-1234-1234-123456789012' in (xray_config_slurp.content | b64decode)"
+          - "(xray_clients[0].id) in (xray_config_slurp.content | b64decode)"
           - "'www.example.com' in (xray_config_slurp.content | b64decode)"
         fail_msg: "config.json does not contain expected port, UUID, or serverName (AC-5)"
 
